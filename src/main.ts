@@ -55,27 +55,28 @@ function stopSpotifyPlayback(): void {
   });
 }
 
-/** Finds an active/available device and starts playback; true means "proceed to start the timer". */
-async function tryStartPlayback(playlistUri: string): Promise<boolean> {
+/**
+ * Finds an active/available device and starts playback. Fire-and-forget from
+ * the caller's perspective — the timer session already started by the time
+ * this resolves; Spotify is an enhancement, not a gate on the timer.
+ */
+async function tryStartPlayback(playlistUri: string): Promise<void> {
   try {
     const devices = await getDevices();
     const device = devices.find((d) => d.isActive) ?? devices[0];
     if (!device) {
-      return await new Promise<boolean>((resolve) => {
-        const dismiss = showDeviceRetryDialog(screen, {
-          onRetry: () => {
-            dismiss();
-            void tryStartPlayback(playlistUri).then(resolve);
-          },
-          onCancel: () => {
-            dismiss();
-            resolve(false);
-          },
-        });
+      const dismiss = showDeviceRetryDialog(screen, {
+        onRetry: () => {
+          dismiss();
+          void tryStartPlayback(playlistUri);
+        },
+        onCancel: () => {
+          dismiss();
+        },
       });
+      return;
     }
     await playContext(device.id, playlistUri);
-    return true;
   } catch (err) {
     if (isPremiumRequiredError(err)) {
       showMessageDialog(screen, "Spotify Premium erforderlich für die Wiedergabesteuerung.");
@@ -85,19 +86,17 @@ async function tryStartPlayback(playlistUri: string): Promise<boolean> {
     } else {
       showMessageDialog(screen, "Spotify-Wiedergabe konnte nicht gestartet werden.");
     }
-    // Spotify is an enhancement, not core: don't block the timer on a playback failure.
-    return true;
   }
 }
 
-async function startSessionWithSpotify(newConfig: TimerConfig): Promise<void> {
-  const playlistUri = getSelectedPlaylistUri();
-  if (isConnected() && playlistUri) {
-    const shouldProceed = await tryStartPlayback(playlistUri);
-    if (!shouldProceed) return;
-  }
+function startSessionWithSpotify(newConfig: TimerConfig): void {
   state = start(newConfig, Date.now());
   persistAndRender();
+
+  const playlistUri = getSelectedPlaylistUri();
+  if (isConnected() && playlistUri) {
+    void tryStartPlayback(playlistUri);
+  }
 }
 
 const timerView = createTimerView({
@@ -128,7 +127,7 @@ function showSettings(): void {
       config,
       onStart: (newConfig) => {
         config = newConfig;
-        void startSessionWithSpotify(newConfig);
+        startSessionWithSpotify(newConfig);
       },
     }),
   );

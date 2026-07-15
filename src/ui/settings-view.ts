@@ -38,6 +38,7 @@ export function createSettingsView({ config, onStart }: SettingsViewOptions): HT
   startBtn.style.marginTop = "8px";
   startBtn.style.alignSelf = "stretch";
   startBtn.addEventListener("click", () => {
+    startBtn.disabled = true;
     onStart({
       workMinutes: workField.value(),
       breakMinutes: breakField.value(),
