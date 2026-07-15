@@ -3,6 +3,7 @@ import "./styles/layout.css";
 import "./styles/components.css";
 
 import { playCue } from "./audio/cue-player";
+import { syncFullscreen } from "./fullscreen";
 import { isAuthError, isPremiumRequiredError } from "./spotify/api";
 import { disconnect, handleRedirectCallback, isConnected } from "./spotify/auth";
 import { getDevices, pausePlayback, playContext } from "./spotify/player";
@@ -24,7 +25,7 @@ import { getSelectedPlaylistUri } from "./ui/spotify-connect-view";
 import { createTimerView } from "./ui/timer-view";
 import { syncWakeLock } from "./wake-lock";
 
-const DEFAULT_CONFIG: TimerConfig = { workMinutes: 25, breakMinutes: 5, cycles: 4 };
+const DEFAULT_CONFIG: TimerConfig = { workMinutes: 50, breakMinutes: 10, cycles: 1 };
 
 const app = document.getElementById("app");
 if (!app) throw new Error("Missing #app root element");
@@ -152,6 +153,7 @@ function render(): void {
   const isRunning =
     (state.phase === "work" || state.phase === "break") && state.pausedRemainingMs === null;
   syncWakeLock(isRunning);
+  syncFullscreen(isRunning);
 }
 
 function persistAndRender(): void {
