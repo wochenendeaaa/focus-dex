@@ -1,0 +1,46 @@
+/* Fixed logical resolution (GBA-like), integer-upscaled to fit the viewport.
+   The scale factor is computed in JS (src/main.ts) and written to --scale. */
+
+:root {
+  --logical-width: 240px;
+  --logical-height: 160px;
+  --scale: 1;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+.viewport {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  inset: 0;
+  background: var(--sw-dark-gray);
+}
+
+.screen {
+  position: relative;
+  width: var(--logical-width);
+  height: var(--logical-height);
+  background: var(--bg-base);
+  transform: scale(var(--scale));
+  transform-origin: center center;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.view {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.view[hidden] {
+  display: none;
+}

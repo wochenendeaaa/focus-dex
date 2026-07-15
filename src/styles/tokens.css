@@ -1,0 +1,76 @@
+/* Sweetie 16 palette (CC0, by GrafxKid) — 16-color retro handheld look */
+:root {
+  --sw-dark-navy: #1a1c2c;
+  --sw-dark-purple: #5d275d;
+  --sw-red: #b13e53;
+  --sw-orange: #ef7d57;
+  --sw-yellow: #ffcd75;
+  --sw-light-green: #a7f070;
+  --sw-green: #38b764;
+  --sw-teal: #257179;
+  --sw-blue: #29366f;
+  --sw-blue-2: #3b5dc9;
+  --sw-light-blue: #41a6f6;
+  --sw-cyan: #73eff7;
+  --sw-white: #f4f4f4;
+  --sw-light-gray: #94b0c2;
+  --sw-gray: #566c86;
+  --sw-dark-gray: #333c57;
+
+  --font-pixel: "PixelOperator", monospace;
+
+  /* Neutral chrome shared by both phases */
+  --frame-border: var(--sw-white);
+  --frame-shadow: var(--sw-dark-gray);
+  --text-primary: var(--sw-white);
+  --text-muted: var(--sw-light-gray);
+}
+
+/* Work phase — "day" palette: warm, high-alert */
+:root[data-phase="work"] {
+  --bg-base: var(--sw-dark-navy);
+  --bg-panel: var(--sw-blue);
+  --accent: var(--sw-orange);
+  --accent-strong: var(--sw-yellow);
+  --bar-fill: var(--sw-orange);
+  --bar-track: var(--sw-dark-gray);
+}
+
+/* Break phase — "night" palette: cool, calm */
+:root[data-phase="break"],
+:root[data-phase="idle"],
+:root[data-phase="done"] {
+  --bg-base: var(--sw-blue);
+  --bg-panel: var(--sw-dark-purple);
+  --accent: var(--sw-light-blue);
+  --accent-strong: var(--sw-cyan);
+  --bar-fill: var(--sw-light-blue);
+  --bar-track: var(--sw-dark-gray);
+}
+
+@font-face {
+  font-family: "PixelOperator";
+  src: url("/fonts/PixelOperator.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--sw-dark-gray);
+  font-family: var(--font-pixel);
+  color: var(--text-primary);
+  -webkit-font-smoothing: none;
+}
+
+img,
+svg,
+canvas {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
