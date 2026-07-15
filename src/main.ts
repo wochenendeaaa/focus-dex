@@ -173,7 +173,7 @@ document.addEventListener("visibilitychange", () => {
 window.addEventListener("focus", applyTick);
 
 function updateScale(): void {
-  const rawScale = Math.min(window.innerWidth / 240, window.innerHeight / 160);
+  const rawScale = Math.min(window.innerWidth / 240, window.innerHeight / 220);
   const scale =
     !Number.isFinite(rawScale) || rawScale <= 0
       ? 1
