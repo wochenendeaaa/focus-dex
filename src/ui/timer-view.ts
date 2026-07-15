@@ -24,6 +24,11 @@ const PHASE_LABEL: Record<string, string> = {
   idle: "",
 };
 
+const RING_RADIUS = 42;
+const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+
 export function createTimerView({ onPauseResume, onSkip, onReset }: TimerViewCallbacks): TimerView {
   const view = document.createElement("div");
   view.className = "view view-timer";
@@ -35,22 +40,42 @@ export function createTimerView({ onPauseResume, onSkip, onReset }: TimerViewCal
   phaseLabel.style.color = "var(--accent-strong)";
   phaseLabel.style.textAlign = "center";
 
+  const ring = document.createElement("div");
+  ring.className = "timer-ring";
+
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("viewBox", "0 0 100 100");
+  svg.classList.add("ring-svg");
+
+  const track = document.createElementNS(SVG_NS, "circle");
+  track.setAttribute("cx", "50");
+  track.setAttribute("cy", "50");
+  track.setAttribute("r", String(RING_RADIUS));
+  track.classList.add("ring-track");
+
+  const fill = document.createElementNS(SVG_NS, "circle");
+  fill.setAttribute("cx", "50");
+  fill.setAttribute("cy", "50");
+  fill.setAttribute("r", String(RING_RADIUS));
+  fill.classList.add("ring-fill");
+  fill.style.strokeDasharray = `${RING_CIRCUMFERENCE}`;
+  fill.style.strokeDashoffset = "0";
+
+  svg.append(track, fill);
+
+  const ringCenter = document.createElement("div");
+  ringCenter.className = "ring-center";
+
   const timeLabel = document.createElement("div");
-  timeLabel.style.fontSize = "24px";
-  timeLabel.style.textAlign = "center";
-  timeLabel.style.margin = "4px 0";
+  timeLabel.style.fontSize = "16px";
 
   const cycleLabel = document.createElement("div");
-  cycleLabel.style.fontSize = "8px";
+  cycleLabel.style.fontSize = "6px";
   cycleLabel.style.color = "var(--text-muted)";
-  cycleLabel.style.textAlign = "center";
-  cycleLabel.style.marginBottom = "6px";
+  cycleLabel.style.marginTop = "2px";
 
-  const barTrack = document.createElement("div");
-  barTrack.className = "bar-track";
-  const barFill = document.createElement("div");
-  barFill.className = "bar-fill";
-  barTrack.appendChild(barFill);
+  ringCenter.append(timeLabel, cycleLabel);
+  ring.append(svg, ringCenter);
 
   const pauseBtn = document.createElement("button");
   pauseBtn.className = "btn";
@@ -71,9 +96,10 @@ export function createTimerView({ onPauseResume, onSkip, onReset }: TimerViewCal
   btnRow.style.marginTop = "8px";
   btnRow.append(pauseBtn, skipBtn, resetBtn);
 
-  const frame = windowFrame(phaseLabel, timeLabel, cycleLabel, barTrack, btnRow);
+  const frame = windowFrame(phaseLabel, ring, btnRow);
   frame.style.display = "flex";
   frame.style.flexDirection = "column";
+  frame.style.alignItems = "center";
   frame.style.minWidth = "160px";
   view.appendChild(frame);
 
@@ -88,8 +114,8 @@ export function createTimerView({ onPauseResume, onSkip, onReset }: TimerViewCal
     timeLabel.textContent = formatMMSS(remaining);
 
     const total = totalPhaseDurationMs(state, config);
-    const fillPct = total > 0 ? (remaining / total) * 100 : 0;
-    barFill.style.width = `${Math.max(0, Math.min(100, fillPct))}%`;
+    const fraction = total > 0 ? Math.max(0, Math.min(1, remaining / total)) : 0;
+    fill.style.strokeDashoffset = `${RING_CIRCUMFERENCE * (1 - fraction)}`;
 
     const isPaused = state.pausedRemainingMs !== null;
     pauseBtn.textContent = isPaused ? "WEITER" : "STOPP";
