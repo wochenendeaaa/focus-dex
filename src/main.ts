@@ -22,6 +22,7 @@ import { showDeviceRetryDialog, showMessageDialog } from "./ui/device-retry-dial
 import { createSettingsView } from "./ui/settings-view";
 import { getSelectedPlaylistUri } from "./ui/spotify-connect-view";
 import { createTimerView } from "./ui/timer-view";
+import { syncWakeLock } from "./wake-lock";
 
 const DEFAULT_CONFIG: TimerConfig = { workMinutes: 25, breakMinutes: 5, cycles: 4 };
 
@@ -148,6 +149,10 @@ function render(): void {
   if (category === "timer") {
     timerView.update(state, config, Date.now());
   }
+
+  const isRunning =
+    (state.phase === "work" || state.phase === "break") && state.pausedRemainingMs === null;
+  syncWakeLock(isRunning);
 }
 
 function persistAndRender(): void {
