@@ -42,7 +42,7 @@ let state: TimerState = persisted?.state ?? initialState;
 state = tick(state, config, Date.now());
 
 function announcePhase(phase: TimerState["phase"]): void {
-  if (phase === "work" || phase === "break") {
+  if (phase === "work" || phase === "break" || phase === "done") {
     playCue(phase);
   }
 }
@@ -139,7 +139,7 @@ function showTimer(): void {
 
 function render(): void {
   document.documentElement.dataset.phase = state.phase;
-  const category = state.phase === "idle" || state.phase === "done" ? "settings" : "timer";
+  const category = state.phase === "idle" ? "settings" : "timer";
   if (category !== renderedView) {
     renderedView = category;
     if (category === "settings") showSettings();

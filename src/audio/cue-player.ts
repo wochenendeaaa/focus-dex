@@ -4,7 +4,7 @@
  * that's an accepted limitation rather than a bug.
  */
 
-export type CueKind = "work" | "break";
+export type CueKind = "work" | "break" | "done";
 
 let audioCtx: AudioContext | null = null;
 
@@ -43,8 +43,12 @@ export function playCue(kind: CueKind): void {
   if (kind === "work") {
     playTone(ctx, 523.25, now, 0.09); // C5 — rising, alerting
     playTone(ctx, 783.99, now + 0.1, 0.14); // G5
-  } else {
+  } else if (kind === "break") {
     playTone(ctx, 659.25, now, 0.09); // E5 — falling, calmer
     playTone(ctx, 440.0, now + 0.1, 0.18); // A4
+  } else {
+    playTone(ctx, 523.25, now, 0.12); // C5 — rising arpeggio, celebratory
+    playTone(ctx, 659.25, now + 0.1, 0.12); // E5
+    playTone(ctx, 783.99, now + 0.2, 0.16); // G5
   }
 }
